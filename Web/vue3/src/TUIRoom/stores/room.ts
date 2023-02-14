@@ -166,6 +166,9 @@ export const useRoomStore = defineStore('room', {
           hasScreenStream,
           audioVolume,
         } = userInfo;
+        if (userId === 'whiteBoard') {
+          return;
+        }
         if (onSeat) {
           obj[`${userId}_${TUIVideoStreamType.kCameraStream}`] = Object.assign(userInfo.cameraStreamInfo, { userId, avatarUrl, userName, hasAudioStream, hasVideoStream, audioVolume, streamType: TUIVideoStreamType.kCameraStream });
         }

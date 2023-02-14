@@ -1,5 +1,5 @@
 <template>
-  <div :class="streamContainerClass">
+  <div id="streamContainer" :class="streamContainerClass">
     <div v-show="showIconControl" ref="enlargedContainerRef" class="enlarged-stream-container">
       <stream-region
         v-if="enlargeStream"
@@ -15,7 +15,7 @@
           :key="`${stream.userId}_${stream.streamType}`"
           :stream="stream"
           :enlarge-dom-id="enlargeDomId"
-          class="single-stream"
+          :class="['single-stream', roomStore.isMaster ? 'master-stream' : '']"
           :style="streamStyle"
           @dblclick="handleEnlargeStreamRegion(stream)"
         ></stream-region>
@@ -72,8 +72,9 @@ const roomEngine = useGetRoomEngine();
 
 const { t } = useI18n();
 
-defineProps<{
+const props = defineProps<{
   showRoomTool: boolean,
+  scale: number,
 }>();
 
 const streamStyle: Ref<Record<string, any>> = ref({ width: '0', height: '0' });
@@ -234,17 +235,21 @@ function handleClickIcon() {
 async function handleNineEqualPointsLayout() {
   streamContainerClass.value = 'stream-container-flatten';
 
+
   enlargeStream.value = null;
 
   const number = showStreamList.value.length;
   let width = 0;
   let height = 0;
-  const roomContainerElement = document.getElementById('roomContainer');
+
+  await nextTick();
+
+  const roomContainerElement = document.getElementById('streamContainer');
   if (!roomContainerElement) {
     return;
   }
-  let containerWidth = roomContainerElement!.offsetWidth;
-  let containerHeight = roomContainerElement!.offsetHeight;
+  let containerWidth = roomContainerElement!.offsetWidth * props.scale;
+  let containerHeight = roomContainerElement!.offsetHeight * props.scale;
   if (number <= 4) {
     containerWidth = number < 2 ? roomContainerElement!.offsetWidth / number : roomContainerElement!.offsetWidth / 2;
     containerHeight = roomContainerElement!.offsetHeight / Math.ceil(number / 2);
@@ -345,10 +350,10 @@ async function handleTopSideListLayout() {
  * 双击切换流到放大区域
 **/
 function handleEnlargeStreamRegion(stream: StreamInfo) {
-  if (layout.value === LAYOUT.NINE_EQUAL_POINTS) {
-    basicStore.setLayout(LAYOUT.RIGHT_SIDE_LIST);
-  }
-  enlargeStream.value = stream;
+  // if (layout.value === LAYOUT.NINE_EQUAL_POINTS) {
+  //   basicStore.setLayout(LAYOUT.RIGHT_SIDE_LIST);
+  // }
+  // enlargeStream.value = stream;
 }
 
 /**
@@ -491,9 +496,9 @@ const onUserVideoStateChanged = (eventInfo: {
     if (hasVideo) {
       enlargeStream.value = roomStore.remoteStreamObj[`${userId}_${streamType}`] as StreamInfo;
       if (enlargeStream.value) {
-        if (layout.value !== LAYOUT.RIGHT_SIDE_LIST && layout.value !== LAYOUT.TOP_SIDE_LIST) {
-          basicStore.setLayout(LAYOUT.RIGHT_SIDE_LIST);
-        }
+        // if (layout.value !== LAYOUT.RIGHT_SIDE_LIST && layout.value !== LAYOUT.TOP_SIDE_LIST) {
+        //   basicStore.setLayout(LAYOUT.RIGHT_SIDE_LIST);
+        // }
       }
     } else {
       /**
@@ -618,9 +623,9 @@ onUnmounted(() => {
 @import '../../assets/style/var.scss';
 
 .stream-container-flatten {
-  width: 100%;
-  height: 100%;
-  background-color: $roomBackgroundColor;
+  width: calc(100% - 300px);
+  height: calc(100% - 200px);
+  background-color: var(--stream-container-flatten-bg-color);
   overflow: hidden;
   .stream-list-container {
     width: 100%;
@@ -636,12 +641,16 @@ onUnmounted(() => {
     align-content: center;
     .single-stream {
       padding: 4px;
+      pointer-events: none;
+    }
+    .master-stream {
+      z-index: 200;
     }
   }
 }
 
 .icon-control {
-  background-color: $toolBarBackgroundColor;
+  background-color: var(--layout-item);
   position: absolute;
   cursor: pointer;
   display: flex;
@@ -697,7 +706,7 @@ onUnmounted(() => {
 .stream-container-top {
   width: 100%;
   height: 100%;
-  background-color: $roomBackgroundColor;
+  background-color: var(--stream-container-flatten-bg-color);
   overflow: hidden;
   position: relative;
   .enlarged-stream-container {
@@ -712,7 +721,7 @@ onUnmounted(() => {
   .stream-list-container {
     width: 100%;
     height: 175px;
-    background-color: $toolBarBackgroundColor;
+    background-color: var(--stream-list-container);
     position: absolute;
     top: 0;
     left: 0;
@@ -747,7 +756,7 @@ onUnmounted(() => {
 .stream-container-right {
   width: 100%;
   height: 100%;
-  background-color: $roomBackgroundColor;
+  background-color: var(--stream-container-flatten-bg-color);
   overflow: hidden;
   display: flex;
   flex-wrap: nowrap;
@@ -767,7 +776,7 @@ onUnmounted(() => {
     top: 0;
     right: 0;
     padding: 48px 10px 80px;
-    background-color: $toolBarBackgroundColor;
+    background-color: var(--stream-list-container);
     display: flex;
     align-items: center;
     &.hide-list {

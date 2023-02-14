@@ -64,6 +64,7 @@ export default {
   'Full screen': '全屏',
   Members: '管理成员',
   Invite: '邀请成员',
+  Live: '直播',
   Settings: '设置',
   End: '结束会议',
   'You are currently the room host, please select the appropriate action.If you select "Leave Room", the room will not be dissolved and you will need to appoint a new host.': '您当前是房间主持人，请选择相应操作。若选择“离开房间”，则房间不会解散，您需要指定新主持人。',

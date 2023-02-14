@@ -128,7 +128,7 @@ onUnmounted(() => {
     &.is-me {
       align-items: end;
       .message-body {
-        background-color: #373D4D;
+        background-color: var(--message-color);
         min-width: 24px;
       }
     }

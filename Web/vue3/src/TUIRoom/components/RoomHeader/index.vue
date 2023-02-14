@@ -9,11 +9,12 @@
         @log-out="$emit('log-out')"
       ></user-info>
       <language class="header-item language"></language>
+      <switch-theme class="header-item theme"></switch-theme>
     </div>
     <div class="right-container">
       <!-- <network-info></network-info> -->
       <!-- <info-control></info-control> -->
-      <layout-control></layout-control>
+      <!-- <layout-control></layout-control> -->
     </div>
   </div>
 </template>
@@ -21,6 +22,7 @@
 <script setup lang="ts">
 import UserInfo from './UserInfo.vue';
 import Language from './Language.vue';
+import SwitchTheme from './SwitchTheme.vue';
 // import NetworkInfo from './NetworkInfo.vue';
 /**
  * [info] Functions to be improved

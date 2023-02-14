@@ -84,48 +84,48 @@ const { localUser, localVideoProfile } = storeToRefs(roomStore);
 const roomContentRef = ref<InstanceType<typeof RoomContent>>();
 const showRoomTool: Ref<boolean> = ref(true);
 const roomRef: Ref<Node | undefined> = ref();
-function handleHideRoomTool() {
-  showRoomTool.value = false;
-}
+// function handleHideRoomTool() {
+//   showRoomTool.value = false;
+// }
 
-const handleHideRoomToolDebounce = debounce(handleHideRoomTool, 5000);
-const handleHideRoomToolThrottle = throttle(handleHideRoomToolDebounce, 1000);
+// const handleHideRoomToolDebounce = debounce(handleHideRoomTool, 5000);
+// const handleHideRoomToolThrottle = throttle(handleHideRoomToolDebounce, 1000);
 
-onMounted(() => {
-  roomRef.value?.addEventListener('mouseenter', () => {
-    showRoomTool.value = true;
-    handleHideRoomToolDebounce();
-  });
-  roomRef.value?.addEventListener('click', () => {
-    showRoomTool.value = true;
-    handleHideRoomToolDebounce();
-  }, false);
-  roomRef.value?.addEventListener('mousemove', () => {
-    showRoomTool.value = true;
-    handleHideRoomToolThrottle();
-  });
-  roomRef.value?.addEventListener('mouseleave', () => {
-    showRoomTool.value = false;
-  });
-});
+// onMounted(() => {
+//   roomRef.value?.addEventListener('mouseenter', () => {
+//     showRoomTool.value = true;
+//     handleHideRoomToolDebounce();
+//   });
+//   roomRef.value?.addEventListener('click', () => {
+//     showRoomTool.value = true;
+//     handleHideRoomToolDebounce();
+//   }, false);
+//   roomRef.value?.addEventListener('mousemove', () => {
+//     showRoomTool.value = true;
+//     handleHideRoomToolThrottle();
+//   });
+//   roomRef.value?.addEventListener('mouseleave', () => {
+//     showRoomTool.value = false;
+//   });
+// });
 
-onUnmounted(() => {
-  roomRef.value?.removeEventListener('mouseenter', () => {
-    showRoomTool.value = true;
-    handleHideRoomToolDebounce();
-  });
-  roomRef.value?.removeEventListener('click', () => {
-    showRoomTool.value = true;
-    handleHideRoomToolDebounce();
-  }, false);
-  roomRef.value?.removeEventListener('mousemove', () => {
-    showRoomTool.value = true;
-    handleHideRoomToolThrottle();
-  });
-  roomRef.value?.removeEventListener('mouseleave', () => {
-    showRoomTool.value = false;
-  });
-});
+// onUnmounted(() => {
+//   roomRef.value?.removeEventListener('mouseenter', () => {
+//     showRoomTool.value = true;
+//     handleHideRoomToolDebounce();
+//   });
+//   roomRef.value?.removeEventListener('click', () => {
+//     showRoomTool.value = true;
+//     handleHideRoomToolDebounce();
+//   }, false);
+//   roomRef.value?.removeEventListener('mousemove', () => {
+//     showRoomTool.value = true;
+//     handleHideRoomToolThrottle();
+//   });
+//   roomRef.value?.removeEventListener('mouseleave', () => {
+//     showRoomTool.value = false;
+//   });
+// });
 
 interface RoomParam {
 	isOpenCamera: boolean,
@@ -141,14 +141,18 @@ interface RoomInitData {
   userSig: string,
   userName: string,
   avatarUrl: string,
+  theme?: {
+    defaultTheme: 'black' | 'white',
+    isSupportSwitchTheme: boolean,
+  },
 }
 
-async function init(option: RoomInitData) {
-  const { sdkAppId, userId, userSig, userName, avatarUrl } = option;
+async function init(roomData: RoomInitData) {
+  basicStore.setBasicInfo(roomData);
+  roomStore.setLocalUser(roomData);
+  const { sdkAppId, userId, userSig, userName, avatarUrl } = roomData;
   await TUIRoomEngine.init({ sdkAppId, userId, userSig });
   await TUIRoomEngine.setSelfInfo({ userName, avatarUrl });
-  basicStore.setBasicInfo(option);
-  roomStore.setLocalUser(option);
 }
 
 async function createRoom(options: {
@@ -493,6 +497,17 @@ watch(sdkAppId, (val: number) => {
 });
 </script>
 
+<style>
+@import './assets/style/black-theme.scss';
+@import './assets/style/white-theme.scss';
+.tui-room * {
+    transition: background-color .5s,color .5s;
+  }
+.tui-room [class|="el"] {
+  animation-fill-mode: forwards;
+}
+</style>
+
 <style lang="scss" scoped>
 @import './assets/style/var.scss';
 
@@ -500,6 +515,8 @@ watch(sdkAppId, (val: number) => {
   width: 100%;
   height: 100%;
   position: relative;
+  display: flex;
+  flex-direction: column;
   * {
     color: $fontColor;
     box-sizing: border-box;
@@ -510,16 +527,11 @@ watch(sdkAppId, (val: number) => {
   .header {
     width: 100%;
     height: 48px;
-    background-color: $toolBarBackgroundColor;
+    background-color: var(--room-header-bg-color);
     position: absolute;
     top: 0;
     left: 0;
     z-index: 100;
-  }
-  .content {
-    width: 100%;
-    height: 100%;
-    background-color: $roomBackgroundColor;
   }
   .footer {
     position: absolute;
@@ -527,7 +539,13 @@ watch(sdkAppId, (val: number) => {
     left: 0;
     width: 100%;
     height: 80px;
-    background-color: $toolBarBackgroundColor;
+    background-color: var(--room-footer-bg-color);
+  }
+  .content {
+    width: 100%;
+    height: calc(100% - 128px);
+    position: relative;
+    top: 48px;
   }
 }
 </style>

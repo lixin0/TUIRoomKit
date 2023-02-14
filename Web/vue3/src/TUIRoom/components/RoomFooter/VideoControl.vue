@@ -16,6 +16,7 @@
     <div class="video-control-container" @click="emits('click')">
       <icon-button
         ref="videoIconButtonRef"
+        :is-active="!localStream.hasVideoStream"
         :title="t('Camera')"
         :icon-name="iconName"
         :has-more="true"
@@ -220,7 +221,7 @@ $videoTabWidth: 320px;
     bottom: 90px;
     left: -60px;
     width: $videoTabWidth;
-    background: $toolBarBackgroundColor;
+    background: var(--room-videotab-bg-color);
     padding: 20px;
   }
 }

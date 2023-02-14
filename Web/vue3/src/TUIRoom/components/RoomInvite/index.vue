@@ -96,7 +96,7 @@ function onCopy(value: string | number) {
     }
     .invite-title {
       font-size: 14px;
-      color: #CFD4E6;
+      color: var(--invite-title-color);
       width: 100%;
     }
     .input-area {
@@ -104,10 +104,10 @@ function onCopy(value: string | number) {
       position: relative;
       .input{
         -webkit-appearance: none;
-          background-color: #2E323D;
+          background-color: var(--input-bg-color);
           background-image: none;
           border-radius: 2px;
-          border: 1px solid #2E323D;
+          border: 1px solid var(--input-border-color);
           box-sizing: border-box;
           color: #7C85A6;
           display: inline-block;

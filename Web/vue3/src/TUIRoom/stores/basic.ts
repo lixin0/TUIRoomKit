@@ -25,6 +25,9 @@ interface BasicState {
   localQuality: number,
   // statistics: TRTCStatistics,
   lang: string,
+  defaultTheme: string,
+  isSupportSwitchTheme: boolean,
+  boardScale: number,
 }
 
 export const useBasicStore = defineStore('basic', {
@@ -60,6 +63,9 @@ export const useBasicStore = defineStore('basic', {
     //   upLoss: 0,
     // },
     lang: getLanguage(),
+    defaultTheme: 'black',
+    isSupportSwitchTheme: true,
+    boardScale: 1,
   }),
   getters: {
     // localVideoBitrate: (state) => {
@@ -123,14 +129,25 @@ export const useBasicStore = defineStore('basic', {
     setIsLocalStreamMirror(mirror: boolean) {
       this.isLocalStreamMirror = mirror;
     },
+    setDefaultTheme(defaultTheme: string) {
+      this.defaultTheme = defaultTheme;
+    },
+    setIsSupportSwitchTheme(isSupportSwitchTheme: boolean) {
+      this.isSupportSwitchTheme = isSupportSwitchTheme;
+    },
     setBasicInfo(infoObj: any) {
-      const { sdkAppId, userId, userSig, userName, avatarUrl, roomId } = infoObj;
+      if (!infoObj) {
+        return;
+      }
+      const { sdkAppId, userId, userSig, userName, avatarUrl, roomId, defaultTheme = 'black', isSupportSwitchTheme = false } = infoObj;
       sdkAppId && this.setSdkAppId(sdkAppId);
       userId && this.setUserId(userId);
       userSig && this.setUserSig(userSig);
       userName && this.setUserName(userName);
       avatarUrl && this.setAvatarUrl(avatarUrl);
       roomId && this.setRoomId(roomId);
+      defaultTheme && this.setDefaultTheme(defaultTheme);
+      typeof isSupportSwitchTheme && this.setIsSupportSwitchTheme(isSupportSwitchTheme);
     },
     setMasterUserId(userId: string) {
       this.masterUserId = userId;
@@ -144,6 +161,9 @@ export const useBasicStore = defineStore('basic', {
     // },
     setLang(lang: string) {
       this.lang = lang;
+    },
+    setBoardScale(scaleValue: number) {
+      this.boardScale = scaleValue;
     },
     reset() {
       this.isSidebarOpen = false;

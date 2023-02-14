@@ -68,13 +68,17 @@ export const userInfo = {
   avatarUrl: '',
 };
 
+export function generateUserSig(userId) {
+  const generator = new LibGenerateTestUserSig(SDKAPPID, SECRETKEY, EXPIRETIME);
+  return generator.genTestUserSig(userId);
+}
+
 export function getBasicInfo() {
   if (SDKAPPID === Number(0) || SECRETKEY === String('')) {
     alert('Please configure your SDKAPPID in config/basic-info-config.js');
     return;
   }
-  const generator = new LibGenerateTestUserSig(SDKAPPID, SECRETKEY, EXPIRETIME);
-  const userSig = generator.genTestUserSig(userInfo.userId);
+  const userSig = generateUserSig(userInfo.userId);
   const { userId, userName, avatarUrl } = userInfo;
   return {
     sdkAppId: SDKAPPID,

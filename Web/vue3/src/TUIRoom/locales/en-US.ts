@@ -64,6 +64,7 @@ export default {
   'Full screen': 'Full screen',
   Members: 'Members',
   Invite: 'Invite',
+  Live: 'Live',
   Settings: 'Settings',
   End: 'End',
   'You are currently the room host, please select the appropriate action.If you select "Leave Room", the room will not be dissolved and you will need to appoint a new host.': 'You are currently the room host, please select the appropriate action.If you select "Leave Room", the room will not be dissolved and you will need to appoint a new host.',

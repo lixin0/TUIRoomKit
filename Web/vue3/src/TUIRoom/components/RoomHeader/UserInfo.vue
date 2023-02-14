@@ -187,13 +187,15 @@ onUnmounted(() => {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      color: var(--color-font);
     }
     .down-icon {
       margin-left: 4px;
     }
   }
   .user-control-container {
-    background: rgba(46,50,61,0.60);
+    background: var(--user-control-container-color-bg);
+    color: var(--color-font);
     padding: 10px 0;
     position: absolute;
     top: calc(100% + 14px);

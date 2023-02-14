@@ -16,6 +16,7 @@
     <div class="audio-control-container" @click="emits('click')">
       <icon-button
         ref="audioIconButtonRef"
+        :is-active="!localStream.hasAudioStream"
         :title="t('Mic')"
         :has-more="true"
         :show-more="showAudioSettingTab"
@@ -207,7 +208,7 @@ $audioTabWidth: 320px;
     bottom: 90px;
     left: 15px;
     width: $audioTabWidth;
-    background: $toolBarBackgroundColor;
+    background: var(--room-audiotab-bg-color);
     padding: 20px;
   }
 }

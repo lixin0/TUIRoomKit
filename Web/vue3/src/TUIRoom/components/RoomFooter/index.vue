@@ -16,6 +16,7 @@
       <apply-control v-if="roomStore.enableSeatControl" @click="report('applyControl')"></apply-control>
       <more-control @click="report('moreControl')"></more-control>
       <setting-control @click="report('settingControl')"></setting-control>
+      <live-control v-if="roomStore.isMaster"></live-control>
     </div>
     <div class="right-container">
       <end-control
@@ -38,6 +39,7 @@ import ChatControl from './ChatControl.vue';
 import ApplyControl from './ApplyControl/Index.vue';
 import MoreControl from './MoreControl.vue';
 import SettingControl from './SettingControl.vue';
+import LiveControl from './LiveControl.vue';
 import EndControl from './EndControl.vue';
 
 
@@ -71,6 +73,7 @@ function report(name: string) {
   padding-right: 24px;
   display: flex;
   justify-content: space-between;
+  z-index: 100;
   .left-container {
     height: 100%;
     display: flex;

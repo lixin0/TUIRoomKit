@@ -27,4 +27,7 @@ export enum ICON_NAME {
   ApplyOnSeat = 'apply',
   ApplyActive = 'apply-active',
   GoOffSeat = 'go-off-seat',
+  Live = 'live',
+  LiveActive = 'live-active',
+  Living = 'living',
 }

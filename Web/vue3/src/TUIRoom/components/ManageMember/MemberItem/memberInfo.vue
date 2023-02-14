@@ -109,8 +109,8 @@ const isMe = computed(() => basicStore.userId === props.userInfo.userId);
     font-size: 12px;
     margin-left: 13px;
     padding: 2px;
-    color: #4D70FF;
-    background: #2E323D;
+    color: var(--user-extra-info-color);
+    background: var(--user-extra-info-bg-color);
     border-radius: 8px;
     padding: 0 6px;
   }
