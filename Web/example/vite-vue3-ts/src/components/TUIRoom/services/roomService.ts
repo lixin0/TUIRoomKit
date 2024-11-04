@@ -55,7 +55,7 @@ export class RoomService implements IRoomService {
   // public configManager = new ConfigManager(this);
   public userManager = new UserManager(this);
   // public mediaManager = new MediaManager(this);
-  // public lifeCycleManager: LifeCycleManager = new LifeCycleManager(this);
+  public lifeCycleManager: LifeCycleManager = new LifeCycleManager(this);
   // public roomActionManager: RoomActionManager = new RoomActionManager(this);
   // public waterMark = new WaterMark(this);
   // public virtualBackground = new VirtualBackground(this);
@@ -118,13 +118,13 @@ export class RoomService implements IRoomService {
     if (!RoomService.instance) return;
     RoomService.instance.lifeCycleManager.stop();
     RoomService.instance.unBindRoomEngineEvents();
-    RoomService.instance.waterMark.dispose();
-    RoomService.instance.virtualBackground.dispose();
-    RoomService.instance.basicBeauty.dispose();
-    RoomService.instance.scheduleConferenceManager.dispose();
-    RoomService.instance.conferenceInvitationManager.dispose();
-    RoomService.instance.mediaManager.dispose();
-    RoomService.instance.chatManager.dispose();
+    // RoomService.instance.waterMark.dispose();
+    // RoomService.instance.virtualBackground.dispose();
+    // RoomService.instance.basicBeauty.dispose();
+    // RoomService.instance.scheduleConferenceManager.dispose();
+    // RoomService.instance.conferenceInvitationManager.dispose();
+    // RoomService.instance.mediaManager.dispose();
+    // RoomService.instance.chatManager.dispose();
     RoomService.instance = undefined;
   }
 
@@ -243,7 +243,7 @@ export class RoomService implements IRoomService {
 
   private onError(error: any) {
     logger.error('roomEngine.onError: ', error);
-    this.errorHandler.handleError(error, 'onError');
+    // this.errorHandler.handleError(error, 'onError');
   }
 
   private onRoomDismissed(eventInfo: { roomId: string }) {
@@ -464,38 +464,38 @@ export class RoomService implements IRoomService {
     this.emit(EventType.ROOM_LOGIN);
   }
 
-  public async start(roomId: string, params?: StartParams) {
-    return this.roomActionManager.start(roomId, params);
-  }
+  // public async start(roomId: string, params?: StartParams) {
+  //   return this.roomActionManager.start(roomId, params);
+  // }
 
-  public async join(roomId: string, params?: JoinParams) {
-    return this.roomActionManager.join(roomId, params);
-  }
+  // public async join(roomId: string, params?: JoinParams) {
+  //   return this.roomActionManager.join(roomId, params);
+  // }
 
-  public async createRoom(options: {
-    roomId: string;
-    roomName?: string;
-    roomMode: 'FreeToSpeak' | 'SpeakAfterTakingSeat';
-    roomParam?: RoomParam;
-  }) {
-    await this.roomActionManager.createRoom(options);
-  }
+  // public async createRoom(options: {
+  //   roomId: string;
+  //   roomName?: string;
+  //   roomMode: 'FreeToSpeak' | 'SpeakAfterTakingSeat';
+  //   roomParam?: RoomParam;
+  // }) {
+  //   await this.roomActionManager.createRoom(options);
+  // }
 
-  public async enterRoom(options: { roomId: string; roomParam?: RoomParam }) {
-    await this.roomActionManager.enterRoom(options);
-  }
+  // public async enterRoom(options: { roomId: string; roomParam?: RoomParam }) {
+  //   await this.roomActionManager.enterRoom(options);
+  // }
 
-  public async leaveRoom() {
-    await this.roomActionManager.leaveRoom();
-  }
+  // public async leaveRoom() {
+  //   await this.roomActionManager.leaveRoom();
+  // }
 
-  public async dismissRoom() {
-    await this.roomActionManager.dismissRoom();
-  }
+  // public async dismissRoom() {
+  //   await this.roomActionManager.dismissRoom();
+  // }
 
-  public fetchRoomInfo(options?: RoomParamsInfo) {
-    return this.roomActionManager.fetchRoomInfo(options);
-  }
+  // public fetchRoomInfo(options?: RoomParamsInfo) {
+  //   return this.roomActionManager.fetchRoomInfo(options);
+  // }
 
   public async handleRoomEngineReady() {
     const storageCurrentTheme = localStorage.getItem('tuiRoom-currentTheme');
@@ -533,19 +533,19 @@ export class RoomService implements IRoomService {
   }
 
   // Component Manager
-  public getComponentConfig(name: ComponentName) {
-    return this.componentManager.getComponentConfig(name);
-  }
-  public setComponentConfig(options: Partial<ComponentConfig>) {
-    return this.componentManager.setComponentConfig(options);
-  }
-  // Config Manager
-  public setTheme(theme: Theme) {
-    return this.configManager.setTheme(theme);
-  }
-  public setLanguage(language: LanguageOption) {
-    return this.configManager.setLanguage(language);
-  }
+  // public getComponentConfig(name: ComponentName) {
+  //   return this.componentManager.getComponentConfig(name);
+  // }
+  // public setComponentConfig(options: Partial<ComponentConfig>) {
+  //   return this.componentManager.setComponentConfig(options);
+  // }
+  // // Config Manager
+  // public setTheme(theme: Theme) {
+  //   return this.configManager.setTheme(theme);
+  // }
+  // public setLanguage(language: LanguageOption) {
+  //   return this.configManager.setLanguage(language);
+  // }
   // User Manager
   setSelfInfo(options: SelfInfoOptions) {
     return this.userManager.setSelfInfo(options);
@@ -555,9 +555,9 @@ export class RoomService implements IRoomService {
     return this.userManager.getDisplayName(options);
   }
 
-  getMediaManager() {
-    return this.mediaManager;
-  }
+  // getMediaManager() {
+  //   return this.mediaManager;
+  // }
 }
 
 export const roomService = RoomService.getInstance();

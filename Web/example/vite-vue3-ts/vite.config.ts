@@ -20,7 +20,7 @@ export default defineConfig({
         // Custom Split Strategy
         manualChunks: {
           roomEngine: ['@tencentcloud/tuiroom-engine-js'],
-          roomkit: ['@tencentcloud/roomkit-web-vue3'],
+          // roomkit: ['@tencentcloud/roomkit-web-vue3'],
         },
       },
     },

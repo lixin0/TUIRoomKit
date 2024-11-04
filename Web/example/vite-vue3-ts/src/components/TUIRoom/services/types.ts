@@ -12,10 +12,10 @@ import { DataReportManager } from './manager/dataReportManager';
 export interface IRoomService {
   t: any;
   roomEngine: Record<string, any>;
-  // basicStore: ReturnType<typeof useBasicStore>;
-  // roomStore: ReturnType<typeof useRoomStore>;
-  // chatStore: ReturnType<typeof useChatStore>;
-  // lifeCycleManager: LifeCycleManager;
+  basicStore: ReturnType<typeof useBasicStore>;
+  roomStore: ReturnType<typeof useRoomStore>;
+  chatStore: ReturnType<typeof useChatStore>;
+  lifeCycleManager: LifeCycleManager;
   // roomActionManager?: RoomActionManager;
   // scheduleConferenceManager: ScheduleConferenceManager;
   // conferenceInvitationManager: ConferenceInvitationManager;
