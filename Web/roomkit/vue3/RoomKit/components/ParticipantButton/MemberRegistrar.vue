@@ -12,6 +12,7 @@ const { currentRoom } = useRoomState();
 const unregister = conference.registerWidget({
   id: BuiltinWidget.MemberWidget,
   zone: { pc: 'bottom-center' },
+  order: 4,
   component: ParticipantButton,
   panel: {
     title: () => t('Participant.Title', { count: currentRoom.value?.participantCount }),

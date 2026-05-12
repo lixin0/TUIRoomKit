@@ -13,7 +13,7 @@ const joiningRoomId = ref('');
 const roomPasswordVisible = ref(false);
 const { t } = useUIKit();
 
-const handleJoinRoomError = (error: any) => {
+const handleJoinRoomError = (error: any): void => {
   let errorMessage = '';
   let useAlert = false;
 

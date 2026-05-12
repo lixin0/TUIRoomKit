@@ -15,7 +15,7 @@
           <CustomWidgetRenderer zone="top-left" platform="pc">
             <ThemeRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.ThemeWidget)" />
             <LayoutRegistrar
-              v-if="conference.getWidgetVisible(BuiltinWidget.LayoutWidget) && notWebinar()"
+              v-if="conference.getWidgetVisible(BuiltinWidget.LayoutWidget) && notWebinar"
               :layout="participantViewLayout"
               @update:layout="handleLayoutUpdate"
             />
@@ -67,25 +67,25 @@
       <footer :class="['control-bar', { 'toolbar-hidden': !showToolbar } ]">
         <div class="control-left">
           <CustomWidgetRenderer zone="bottom-left" platform="pc">
-            <MicRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.MicWidget) && (!isWebinar || isGuest || isOwner)" />
-            <CameraRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.CameraWidget) && ownerOrNotWebinar()" />
-            <RaiseHandsRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.RaiseHandsWidget) && isWebinar && isAudience" />
+            <MicRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.MicWidget) && (!isWebinar || isParticipant || isOwner)" />
+            <CameraRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.CameraWidget) && ownerOrNotWebinar" />
+            <RaiseHandsRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.RaiseHandsWidget) && isWebinar && (isAudience && isGeneralUser)" />
           </CustomWidgetRenderer>
         </div>
 
         <div class="control-center">
           <CustomWidgetRenderer zone="bottom-center" platform="pc">
-            <ScreenShareRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.ScreenShareWidget) && ownerOrNotWebinar()" />
-            <RaiseHandsListRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.RaiseHandsListWidget) && isWebinar && isOwner" />
-            <InviteRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.InviteWidget) && notWebinar()" />
+            <ScreenShareRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.ScreenShareWidget) && ownerOrNotWebinar" />
+            <RaiseHandsListRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.RaiseHandsListWidget) && isWebinar && (isOwner || isAdmin)" />
+            <InviteRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.InviteWidget) && notWebinar" />
             <ChatRegistrar
-              v-if="conference.getWidgetVisible(BuiltinWidget.RoomChatWidget) && notWebinar()"
+              v-if="conference.getWidgetVisible(BuiltinWidget.RoomChatWidget) && notWebinar"
             />
             <MemberRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.MemberWidget)" />
-            <VirtualBackgroundRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.VirtualBackgroundWidget) && notWebinar()" />
-            <BasicBeautyRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.BasicBeautyWidget) && ownerOrNotWebinar()" />
-            <AIToolsRegistrar v-if="(conference.getWidgetVisible(BuiltinWidget.AIToolsWidget) || !!AIToolsButtonConfig?.visible) && notWebinar() && aiToolsEnabled" />
-            <SettingsRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.SettingsWidget) && ownerOrNotWebinar()" />
+            <VirtualBackgroundRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.VirtualBackgroundWidget) && notWebinar" />
+            <BasicBeautyRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.BasicBeautyWidget) && ownerOrNotWebinar" />
+            <AIToolsRegistrar v-if="(conference.getWidgetVisible(BuiltinWidget.AIToolsWidget) || !!AIToolsButtonConfig?.visible) && notWebinar && aiToolsEnabled" />
+            <SettingsRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.SettingsWidget) && ownerOrNotWebinar" />
             <BarrageRegistrar
               v-if="conference.getWidgetVisible(BuiltinWidget.BarrageWidget) && isWebinar"
             />
@@ -146,7 +146,6 @@ import {
   KickedOutOfRoomReason,
   RoomType,
   RoomParticipantRole,
-  useAITranscriberState,
 } from 'tuikit-atomicx-vue3/room';
 import { conference } from '../../adapter/conference';
 import { ComponentName, RoomEvent as ConferenceRoomEvent, BuiltinWidget } from '../../adapter/type';
@@ -218,8 +217,6 @@ const {
   subscribeEvent: subscribeRoomParticipantEvent,
   unsubscribeEvent: unsubscribeRoomParticipantEvent,
 } = useRoomParticipantState();
-const { startRealtimeTranscriber } = useAITranscriberState();
-
 const {
   isJoiningRoom,
   joiningRoomId,
@@ -229,7 +226,9 @@ const {
 
 const isWebinar = computed(() => currentRoom.value?.roomType === RoomType.Webinar);
 const isOwner = computed(() => localParticipant.value?.role === RoomParticipantRole.Owner);
-const isGuest = computed(() => participantList.value.some(participant => participant.userId === localParticipant.value?.userId));
+const isAdmin = computed(() => localParticipant.value?.role === RoomParticipantRole.Admin);
+const isGeneralUser = computed(() => localParticipant.value?.role === RoomParticipantRole.GeneralUser);
+const isParticipant = computed(() => participantList.value.some(participant => participant.userId === localParticipant.value?.userId));
 const isAudience = computed(() => !participantList.value.some(participant => participant.userId === localParticipant.value?.userId));
 const participantViewLayout: Ref<RoomLayoutTemplate | undefined> = ref(undefined);
 function handleLayoutUpdate(layout: RoomLayoutTemplate) {
@@ -254,8 +253,9 @@ const handleEndRoom = () => {
   eventCenter.emit(ConferenceRoomEvent.ROOM_DISMISS, { roomInfo: cachedRoomInfo || currentRoom.value });
 };
 
-const notWebinar = () => !isWebinar.value;
-const ownerOrNotWebinar = () => !isWebinar.value || isOwner.value;
+const notWebinar = computed(() => !isWebinar.value);
+const ownerOrNotWebinar = computed(() => !isWebinar.value || isOwner.value);
+const participantOrNotWebinar = computed(() => !isWebinar.value || isParticipant.value);
 
 const watermarkConfig = computed(() => conference.getFeatureConfig('watermark'));
 const watermarkEnabled = computed(() => watermarkConfig.value?.enable !== false);
@@ -291,12 +291,6 @@ watch(
     if (!oldRoomId && roomId) {
       await getParticipantList({ cursor: participantListCursor.value });
       await getAudienceList({ cursor: audienceListCursor.value });
-      if ((AIToolsButtonConfig?.visible || aiToolsEnabled.value) && isOwner.value && !isWebinar.value) {
-        await startRealtimeTranscriber({
-          sourceLanguage: 'zh',
-          translationLanguages: ['en'],
-        });
-      }
     }
   },
   { immediate: true },

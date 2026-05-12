@@ -47,9 +47,11 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { Badge, IconApplyManage, TUIButton, TUIDialog, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
-import { Avatar, DeviceRequestInfo, useRoomParticipantState } from 'tuikit-atomicx-vue3/room';
+import { TUIErrorCode } from '@tencentcloud/tuiroom-engine-js';
+import { Badge, IconApplyManage, TUIButton, TUIDialog, TUIToast, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
+import { Avatar, useRoomParticipantState } from 'tuikit-atomicx-vue3/room';
 import IconButton from '../base/IconButton.vue';
+import type { DeviceRequestInfo } from 'tuikit-atomicx-vue3/room';
 
 const { t } = useUIKit();
 
@@ -68,9 +70,18 @@ const handleClick = () => {
   dialogVisible.value = true;
 };
 
-const handleAccept = (invitation: DeviceRequestInfo) => {
-  approveOpenDeviceRequest({ device: invitation.deviceType, userId: invitation.senderUserId });
-  promoteToParticipant({ userId: invitation.senderUserId });
+const handleAccept = async (invitation: DeviceRequestInfo) => {
+  try {
+    await promoteToParticipant({ userId: invitation.senderUserId });
+    await approveOpenDeviceRequest({ device: invitation.deviceType, userId: invitation.senderUserId });
+  } catch (error) {
+    if (error && typeof error === 'object' && 'code' in error && (error.code === TUIErrorCode.ERR_ALL_SEAT_OCCUPIED || error.code === TUIErrorCode.ERR_NO_PERMISSION)) {
+      // todo ERR_ROOM_NOT_SUPPORT_PRELOADING 错误码等待后台确认是否修改
+      TUIToast.error({ message: t('RaiseHands.AcceptFailedBecauseGuestLimitReached') });
+      return;
+    }
+    TUIToast.error({ message: t('RaiseHands.Failed') });
+  }
 };
 
 const handleReject = (invitation: DeviceRequestInfo) => {

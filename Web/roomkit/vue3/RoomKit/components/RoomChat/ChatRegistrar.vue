@@ -13,6 +13,7 @@ const { activeWidgetId } = useRoomSidePanel();
 const unregister = conference.registerWidget({
   id: BuiltinWidget.RoomChatWidget,
   zone: { pc: 'bottom-center' },
+  order: 3,
   component: ChatButton,
   props: () => ({
     isActive: activeWidgetId.value === BuiltinWidget.RoomChatWidget,

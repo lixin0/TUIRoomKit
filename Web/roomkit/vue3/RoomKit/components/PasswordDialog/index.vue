@@ -61,7 +61,7 @@ const isJoining = ref(false);
 
 watch(() => props.modelValue, (val) => {
   visible.value = val;
-});
+}, { immediate: true });
 
 watch(visible, (val) => {
   emit('update:modelValue', val);
@@ -87,9 +87,10 @@ const handleConfirm = async () => {
       password: password.value,
     });
 
+    const joinedPassword = password.value;
     visible.value = false;
     password.value = '';
-    emit('success', { roomId: props.roomId, password: password.value });
+    emit('success', { roomId: props.roomId, password: joinedPassword });
   } catch (error) {
     console.error('Failed to join room with password:', error);
     emit('error', error);

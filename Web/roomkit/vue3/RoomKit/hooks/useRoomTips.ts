@@ -77,20 +77,21 @@ export function useRoomTips() {
     });
   }
 
-  function onParticipantDeviceClosed({ device }: { device: DeviceType; operator: RoomUser }) {
+  function onParticipantDeviceClosed({ device, operator }: { device: DeviceType; operator: RoomUser }) {
+    const operatorName = operator.userName || operator.userId;
     if (device === DeviceType.Microphone) {
       TUIToast.warning({
-        message: t('RoomNotifications.MicrophoneClosed'),
+        message: t('RoomNotifications.MicrophoneClosed', { operatorName }),
       });
     }
     if (device === DeviceType.Camera) {
       TUIToast.warning({
-        message: t('RoomNotifications.CameraClosed'),
+        message: t('RoomNotifications.CameraClosed', { operatorName }),
       });
     }
     if (device === DeviceType.ScreenShare) {
       TUIToast.warning({
-        message: t('RoomNotifications.ScreenShareClosed'),
+        message: t('RoomNotifications.ScreenShareClosed', { operatorName }),
       });
     }
   }

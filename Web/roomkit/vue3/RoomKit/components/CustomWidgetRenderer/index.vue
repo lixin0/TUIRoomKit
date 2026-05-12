@@ -72,13 +72,8 @@
       <div class="measure-item" :data-widget-id="widget.id">
         <div
           v-if="isCustomTrigger(widget)"
-          style="display: contents"
-        >
-          <component
-            :is="widget.component"
-            v-bind="resolveProps(widget)"
-          />
-        </div>
+          class="measure-item-placeholder"
+        />
         <IconButton
           v-else
           :title="resolveLabel(widget)"
@@ -397,5 +392,10 @@ onUnmounted(() => {
 
 .measure-item {
   flex-shrink: 0;
+}
+
+.measure-item-placeholder {
+  width: 56px;
+  height: 32px;
 }
 </style>

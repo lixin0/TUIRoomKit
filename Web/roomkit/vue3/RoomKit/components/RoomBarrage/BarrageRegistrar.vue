@@ -13,6 +13,7 @@ const { activeWidgetId } = useRoomSidePanel();
 const unregister = conference.registerWidget({
   id: BuiltinWidget.BarrageWidget,
   zone: { pc: 'bottom-center' },
+  order: 9,
   component: BarrageButton,
   props: () => ({
     isActive: activeWidgetId.value === BuiltinWidget.BarrageWidget,
