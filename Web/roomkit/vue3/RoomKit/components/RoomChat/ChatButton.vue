@@ -83,6 +83,9 @@ watch(
   () => currentRoom.value?.roomId,
   (roomId) => {
     resetUnreadTracking();
+    if (!loginUserInfo.value?.userId) {
+      return;
+    }
     if (!roomId) {
       setActiveConversation('');
       return;

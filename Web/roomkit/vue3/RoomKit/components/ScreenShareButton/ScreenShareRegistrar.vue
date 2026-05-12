@@ -7,6 +7,7 @@ import ScreenShareButton from './index.vue';
 const unregister = conference.registerWidget({
   id: BuiltinWidget.ScreenShareWidget,
   zone: { pc: 'bottom-center' },
+  order: 0,
   component: ScreenShareButton,
 });
 

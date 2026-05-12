@@ -102,14 +102,16 @@ class Conference extends ConferenceDeprecated implements IConference {
     } catch (error) {
       isJoiningRoom.value = false;
       handleJoinRoomError(error);
-      throw error;
+      return;
     }
     isJoiningRoom.value = false;
   }
 
   public async joinRoom({ roomId, roomType, password }: { roomId: string; roomType?: RoomType; password?: string }) {
     const { joinRoom } = useRoomState();
-    const { isJoiningRoom, joiningRoomId, handleJoinRoomError } = useRoomLifeCycle();
+    const { isJoiningRoom, joiningRoomId, handleJoinRoomError, roomPasswordVisible } = useRoomLifeCycle();
+    // Reset before each attempt so the PasswordDialog watch reliably fires (false → true).
+    roomPasswordVisible.value = false;
     isJoiningRoom.value = true;
     joiningRoomId.value = roomId;
     try {
@@ -121,7 +123,7 @@ class Conference extends ConferenceDeprecated implements IConference {
     } catch (error) {
       isJoiningRoom.value = false;
       handleJoinRoomError(error);
-      throw error;
+      return;
     }
     isJoiningRoom.value = false;
     joiningRoomId.value = '';

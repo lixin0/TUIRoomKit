@@ -7,6 +7,7 @@ import VirtualBackgroundButton from './index.vue';
 const unregister = conference.registerWidget({
   id: BuiltinWidget.VirtualBackgroundWidget,
   zone: { pc: 'bottom-center' },
+  order: 5,
   component: VirtualBackgroundButton,
 });
 

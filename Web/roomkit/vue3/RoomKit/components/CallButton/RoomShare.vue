@@ -52,16 +52,6 @@
         </div>
       </div>
 
-      <div class="share-item">
-        <div class="share-label">
-          {{ t('RoomShare.RoomSchemeLink') }}
-        </div>
-        <div class="share-value room-link">
-          <span class="room-link-text">{{ roomSchemeLink }}</span>
-          <IconCopy class="copy-icon" @click="() => copy(roomSchemeLink)" />
-        </div>
-      </div>
-
       <div class="share-actions">
         <TUIButton
           type="primary"
@@ -81,7 +71,7 @@ import { computed } from 'vue';
 import { IconCopy, TUIButton, TUIToast, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
 import { conference } from '../../adapter/conference';
 import { useCopy } from '../../hooks/useCopy';
-import { generateRoomLink, generateRoomSchemeLink } from '../../utils/utils';
+import { generateRoomLink } from '../../utils/utils';
 import type { RoomInfo } from 'tuikit-atomicx-vue3/room';
 
 const { t } = useUIKit();
@@ -119,13 +109,6 @@ const roomLink = computed(() => {
   return generateRoomLink(props.roomInfo.roomId, props.roomInfo.password, props.roomInfo.roomType);
 });
 
-const roomSchemeLink = computed(() => {
-  if (!props.roomInfo?.roomId) {
-    return '';
-  }
-  return generateRoomSchemeLink(props.roomInfo.roomId, props.roomInfo.password, props.roomInfo.roomType);
-});
-
 const copyRoomInfoAndLink = async () => {
   if (!props.roomInfo) {
     TUIToast.error({ message: t('RoomShare.NoRoomInfo') });
@@ -138,7 +121,6 @@ const copyRoomInfoAndLink = async () => {
     props.roomInfo.password ? `${t('RoomShare.Password')}: ${props.roomInfo.password}` : null,
     props.roomInfo.scheduledStartTime && props.roomInfo.scheduledEndTime ? `${t('RoomShare.RoomTime')}: ${formatDateTime(props.roomInfo.scheduledStartTime)} - ${formatDateTime(props.roomInfo.scheduledEndTime)}` : null,
     `${t('RoomShare.RoomLink')}: ${roomLink.value}`,
-    `${t('RoomShare.RoomSchemeLink')}: ${roomSchemeLink.value}`,
   ].filter(Boolean);
 
   const roomInfoText = roomInfoLines.join('\n');

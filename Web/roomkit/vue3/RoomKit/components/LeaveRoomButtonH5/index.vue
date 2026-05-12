@@ -21,14 +21,14 @@
         </div>
 
         <div class="button-container">
-          <div class="button-item end-room" @click="handleEndRoom">
-            {{ t('Room.EndRoom') }}
-          </div>
           <div
             class="button-item leave-room"
             @click="handleLeaveFromConfirmDialog"
           >
             {{ t('Room.LeaveRoom') }}
+          </div>
+          <div class="button-item end-room" @click="handleEndRoom">
+            {{ t('Room.EndRoom') }}
           </div>
         </div>
       </div>
@@ -100,9 +100,10 @@ import {
   useRoomParticipantState,
   useRoomState,
 } from 'tuikit-atomicx-vue3/room';
-import PopUpArrowDown from '../base/PopUpArrowDown.vue';
-import { eventCenter } from '../../utils/eventCenter';
 import { RoomEvent as ConferenceRoomEvent } from '../../adapter/type';
+import { useASRToolsState } from '../../hooks/useASRToolsState';
+import { eventCenter } from '../../utils/eventCenter';
+import PopUpArrowDown from '../base/PopUpArrowDown.vue';
 
 const { t } = useUIKit();
 const emit = defineEmits(['leave', 'end']);
@@ -114,6 +115,7 @@ const {
 } = useRoomState();
 const { localParticipant, participantList, transferOwner }
   = useRoomParticipantState();
+const { hasStartedASR, stopASR } = useASRToolsState();
 
 const showTransferDialog = ref(false);
 const showConfirmDialog = ref(false);
@@ -130,6 +132,9 @@ const otherParticipants = computed(() =>
 const dialogMessage = computed(() => {
   if (otherParticipants.value.length === 0) {
     return t('Room.LeaveRoomTip');
+  }
+  if (hasStartedASR.value) {
+    return t('Room.ConfirmLeaveWithAsrTip');
   }
   return t('Room.ConfirmLeaveTip');
 });
@@ -208,6 +213,10 @@ const autoTransferAndLeave = async () => {
   try {
     const targetParticipant = otherParticipants.value[0];
 
+    if (hasStartedASR.value) {
+      await stopASR({ suppressError: true, resetState: true });
+    }
+
     await transferOwner({ userId: targetParticipant.userId });
     await leaveRoom();
 
@@ -250,6 +259,10 @@ const handleTransferAndLeave = async () => {
 
   try {
     isTransferring.value = true;
+
+    if (hasStartedASR.value) {
+      await stopASR({ suppressError: true, resetState: true });
+    }
 
     await transferOwner({ userId: selectedUserId.value });
 

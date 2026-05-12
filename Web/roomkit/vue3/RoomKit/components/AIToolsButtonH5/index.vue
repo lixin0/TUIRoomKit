@@ -38,50 +38,132 @@
       <div class="transcription-popup-header">
         {{ t('AITools.RealtimeMessageList') }}
       </div>
-      <RealtimeMessageList />
+      <RealtimeMessageList
+        :target-language="targetLanguage"
+        :display-mode="subtitleDisplayMode"
+      />
     </div>
   </TUIPopup>
 
   <Teleport to="body">
-    <Subtitle v-if="isSubtitlesVisible" />
+    <div v-if="isSubtitlesVisible" class="ai-subtitle-h5">
+      <Subtitle
+        class="subtitle-panel-trigger-h5"
+        :target-language="targetLanguage"
+        :display-mode="subtitleDisplayMode"
+        layout="h5"
+        @click="openSettingsPanel"
+      >
+        <template #suffix>
+          <div
+            class="subtitle-settings-trigger-h5"
+            @click="openSettingsPanel"
+          >
+            <IconRightArrow
+              class="subtitle-arrow-h5"
+              :size="10"
+            />
+          </div>
+        </template>
+      </Subtitle>
+    </div>
   </Teleport>
+  <AISettingsPopup
+    v-if="isSettingsPopupVisible"
+    :is-owner="isOwner"
+    @close="isSettingsPopupVisible = false"
+  />
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import {
   IconAIIcon,
   IconAISubtitles,
   IconAITranscription,
+  IconRightArrow,
   TUIPopup,
   useUIKit,
 } from '@tencentcloud/uikit-base-component-vue3';
-import { Subtitle, RealtimeMessageList } from 'tuikit-atomicx-vue3/room';
+import { RoomParticipantRole } from 'tuikit-atomicx-vue3';
+import {
+  Subtitle,
+  RealtimeMessageList,
+  useRoomParticipantState,
+  useRoomState,
+} from 'tuikit-atomicx-vue3/room';
+import { useASRToolsState } from '../../hooks/useASRToolsState';
 import { useRoomToolbarH5 } from '../../hooks/useRoomToolbarH5';
 import { useSubtitlesState } from '../../hooks/useSubtitlesState';
 import IconButtonH5 from '../base/IconButtonH5.vue';
 import PopUpArrowDown from '../base/PopUpArrowDown.vue';
+import AISettingsPopup from './AISettingsPopup.vue';
 
 const { t } = useUIKit();
 const { showToolbar } = useRoomToolbarH5();
 const { isSubtitlesVisible } = useSubtitlesState();
+const { currentRoom } = useRoomState();
+const { localParticipant } = useRoomParticipantState();
+const {
+  targetLanguage,
+  subtitleDisplayMode,
+  hasStartedASR,
+  ensureASRStarted,
+} = useASRToolsState();
 const isAIToolsPanelVisible = ref(false);
 const isTranscriptionPanelVisible = ref(false);
+const isSettingsPopupVisible = ref(false);
+const isOwner = computed(() => currentRoom.value?.roomOwner.userId === localParticipant.value?.userId);
 
 function closeAIToolsPanel() {
   isAIToolsPanelVisible.value = false;
 }
 
-function toggleSubtitles() {
+async function toggleSubtitles() {
+  if (!isSubtitlesVisible.value) {
+    await ensureASRStarted();
+  }
+
   isSubtitlesVisible.value = !isSubtitlesVisible.value;
   showToolbar.value = false;
   closeAIToolsPanel();
 }
 
-function openTranscriptionPanel() {
+async function openTranscriptionPanel() {
+  if (!isTranscriptionPanelVisible.value) {
+    await ensureASRStarted();
+  }
+
   isTranscriptionPanelVisible.value = true;
   closeAIToolsPanel();
 }
+
+function openSettingsPanel() {
+  isSettingsPopupVisible.value = true;
+  showToolbar.value = false;
+  closeAIToolsPanel();
+}
+
+function closeASRRelatedUI() {
+  isSubtitlesVisible.value = false;
+  isTranscriptionPanelVisible.value = false;
+}
+
+watch(
+  hasStartedASR,
+  (started, previousStarted) => {
+    if (previousStarted && !started) {
+      closeASRRelatedUI();
+    }
+  },
+);
+
+watch(() => localParticipant.value?.role, (role, previousRole) => {
+  if (role === RoomParticipantRole.Owner && previousRole !== role) {
+    closeASRRelatedUI();
+  }
+});
+
 </script>
 
 <style lang="scss" scoped>
@@ -156,5 +238,42 @@ function openTranscriptionPanel() {
     font-weight: 600;
     padding: 12px 20px;
   }
+}
+
+.subtitle-settings-trigger-h5 {
+  width: 24px;
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: -4px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.subtitle-panel-trigger-h5 {
+  width: 100%;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.subtitle-arrow-h5 {
+  color: rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-subtitle-h5 {
+  position: fixed;
+  left: 50%;
+  bottom: 96px;
+  transform: translateX(-50%);
+  width: calc(100vw - 32px);
+  max-width: 420px;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  text-align: initial;
 }
 </style>

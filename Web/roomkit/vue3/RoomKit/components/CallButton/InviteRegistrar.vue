@@ -7,6 +7,7 @@ import CallButton from './index.vue';
 const unregister = conference.registerWidget({
   id: BuiltinWidget.InviteWidget,
   zone: { pc: 'bottom-center' },
+  order: 2,
   component: CallButton,
 });
 

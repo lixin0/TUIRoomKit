@@ -7,6 +7,7 @@ import BasicBeautyButton from './index.vue';
 const unregister = conference.registerWidget({
   id: BuiltinWidget.BasicBeautyWidget,
   zone: { pc: 'bottom-center' },
+  order: 6,
   component: BasicBeautyButton,
 });
 

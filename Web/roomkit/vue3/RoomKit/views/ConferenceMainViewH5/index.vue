@@ -85,7 +85,6 @@ import {
   useLoginState,
   useRoomState,
   useRoomParticipantState,
-  useAITranscriberState,
   RoomEvent,
   RoomParticipantEvent,
   KickedOutOfRoomReason,
@@ -155,8 +154,6 @@ const {
   subscribeEvent: subscribeRoomEvent,
   unsubscribeEvent: unsubscribeRoomEvent,
 } = useRoomState();
-const { startRealtimeTranscriber } = useAITranscriberState();
-
 const {
   isJoiningRoom,
   joiningRoomId,
@@ -187,12 +184,6 @@ watch(
   async (roomId, oldRoomId) => {
     if (!oldRoomId && roomId) {
       await getParticipantList({ cursor: participantListCursor.value });
-      if ((AIToolsButtonConfig?.visible || aiToolsEnabled.value) && isOwner.value && !isWebinar.value) {
-        await startRealtimeTranscriber({
-          sourceLanguage: 'zh',
-          translationLanguages: ['en'],
-        });
-      }
     }
   },
   { immediate: true },

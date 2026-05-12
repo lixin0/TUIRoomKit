@@ -7,6 +7,7 @@ import RaiseHandsButton from './index.vue';
 const unregister = conference.registerWidget({
   id: BuiltinWidget.RaiseHandsWidget,
   zone: { pc: 'bottom-left' },
+  order: 1,
   component: RaiseHandsButton,
 });
 

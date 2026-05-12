@@ -40,14 +40,16 @@
 <script setup lang="ts">
 import type { Ref } from 'vue';
 import { ref, computed } from 'vue';
+import { TUIErrorCode } from '@tencentcloud/tuiroom-engine-js';
 import {
   TUIToast,
+  TUIMessageBox,
   IconCameraOn,
   IconCameraOff,
   IconUnSupport,
   useUIKit,
 } from '@tencentcloud/uikit-base-component-vue3';
-import { useDeviceState, useRoomState, DeviceStatus, VideoSettingPanel, useRoomParticipantState, DeviceError, RoomParticipantRole, useRoomModal } from 'tuikit-atomicx-vue3/room';
+import { useDeviceState, useRoomState, DeviceStatus, VideoSettingPanel, useRoomParticipantState, DeviceError, RoomParticipantRole, useRoomModal, RoomType } from 'tuikit-atomicx-vue3/room';
 import { conference } from '../../adapter/conference';
 import { InterceptorAction } from '../../adapter/type';
 import IconButton from '../base/IconButton.vue';
@@ -61,7 +63,7 @@ const { t } = useUIKit();
 const { handleErrorWithModal } = useRoomModal();
 const { cameraStatus, cameraLastError, isCameraTesting, startCameraTest, stopCameraTest, openLocalCamera, closeLocalCamera } = useDeviceState();
 const { currentRoom } = useRoomState();
-const { localParticipant } = useRoomParticipantState();
+const { localParticipant, participantList } = useRoomParticipantState();
 
 const showVideoSettingTab: Ref<boolean> = ref(false);
 const isCameraDisabled = computed(() => {
@@ -72,6 +74,37 @@ const isCameraDisabled = computed(() => {
     return false;
   }
   return currentRoom.value?.isAllCameraDisabled;
+});
+
+function isRoleEqualOrHigher(participantRole: RoomParticipantRole): boolean {
+  const localRole = localParticipant.value?.role ?? RoomParticipantRole.GeneralUser;
+  if (localRole === RoomParticipantRole.GeneralUser) {
+    return true;
+  }
+  if (localRole === RoomParticipantRole.Admin) {
+    return participantRole === RoomParticipantRole.Owner || participantRole === RoomParticipantRole.Admin;
+  }
+  return participantRole === RoomParticipantRole.Owner;
+}
+
+const isHigherRoleParticipantPublishingInWebinar = computed(() => {
+  const isWebinar = currentRoom.value?.roomType === RoomType.Webinar;
+  const lowerRoleParticipantPublishedVideo = participantList.value.some(
+    participant => participant.userId !== localParticipant.value?.userId
+      && participant.cameraStatus === DeviceStatus.On
+      && isRoleEqualOrHigher(participant.role),
+  );
+  return isWebinar && lowerRoleParticipantPublishedVideo;
+});
+
+const isLowerRoleParticipantPublishingInWebinar = computed(() => {
+  const isWebinar = currentRoom.value?.roomType === RoomType.Webinar;
+  const lowerRoleParticipantPublishedVideo = participantList.value.some(
+    participant => participant.userId !== localParticipant.value?.userId
+      && participant.cameraStatus === DeviceStatus.On
+      && !isRoleEqualOrHigher(participant.role),
+  );
+  return isWebinar && lowerRoleParticipantPublishedVideo;
 });
 
 const hasNotSupportError = computed(() => cameraLastError.value !== DeviceError.NoError);
@@ -92,6 +125,12 @@ async function handleClickIcon() {
       });
       return;
     }
+    if (isHigherRoleParticipantPublishingInWebinar.value) {
+      TUIToast.warning({
+        message: t('Camera.HigherRoleParticipantPublishingInWebinar'),
+      });
+      return;
+    }
     if (!currentRoom.value && props.cameraTestContainer) {
       if (isCameraTesting.value) {
         await stopCameraTest();
@@ -101,25 +140,39 @@ async function handleClickIcon() {
       return;
     }
     if (cameraStatus.value === DeviceStatus.On) {
-      conference.executeInterceptor(InterceptorAction.CloseCamera, async () => {
+      await conference.executeInterceptor(InterceptorAction.CloseCamera, async () => {
         await closeLocalCamera();
       });
+    } else if (isLowerRoleParticipantPublishingInWebinar.value) {
+      TUIMessageBox.confirm({
+        title: t('Camera.SomeonePresentingTitle'),
+        content: t('Camera.SomeonePresentingConfirm'),
+        callback: async (action) => {
+          if (action === 'confirm') {
+            try {
+              await conference.executeInterceptor(InterceptorAction.OpenCamera, async () => {
+                await openLocalCamera();
+              });
+            } catch (error: any) {
+              handleErrorWithModal(error);
+              handleErrorWithToast(error);
+            }
+          }
+        },
+      });
     } else {
-      conference.executeInterceptor(InterceptorAction.OpenCamera, async () => {
+      await conference.executeInterceptor(InterceptorAction.OpenCamera, async () => {
         await openLocalCamera();
       });
     }
-  } catch (error) {
+  } catch (error: any) {
     handleErrorWithModal(error);
-    handleErrorWithToast();
+    handleErrorWithToast(error);
   }
 }
 
-function handleErrorWithToast() {
-  if (cameraLastError.value === DeviceError.NoError) {
-    return;
-  }
-  let message = '';
+function handleErrorWithToast(error: { code?: number } | unknown) {
+  let message = t('Camera.UnknownError');
   switch (cameraLastError.value) {
     case DeviceError.NotSupportCapture:
       message = t('Camera.NotSupportCapture');
@@ -134,7 +187,18 @@ function handleErrorWithToast() {
       message = t('Camera.NoDeviceDetected');
       break;
     default:
-      message = t('Camera.UnknownError');
+      break;
+  }
+  const err = error as { code?: number } | undefined;
+  const ERROR_SPEAKER_LIMIT_EXCEEDED = 100253;
+  switch (err?.code) {
+    case ERROR_SPEAKER_LIMIT_EXCEEDED:
+      message = t('Camera.HigherRoleParticipantPublishingInWebinar');
+      break;
+    case TUIErrorCode.ERR_FREQ_LIMIT:
+      message = t('RoomCommon.FrequencyLimit');
+      break;
+    default:
       break;
   }
   TUIToast.warning({
