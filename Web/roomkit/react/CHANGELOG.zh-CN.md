@@ -1,0 +1,14 @@
+# 更新日志
+
+[English](./CHANGELOG.md) | **简体中文**
+
+---
+
+## [6.0.1] - 2026-06-05
+
+### 新增
+
+- 正式发布 `@tencentcloud/roomkit-web-react` npm 包，对外接口与 `@tencentcloud/roomkit-web-vue3` 保持一致，同时提供 ESM 与 CJS 两种构建产物及完整 TypeScript 类型声明。
+- 支持进房前预览（`PreConferenceView`）与会议主界面（`ConferenceMainView`）两大核心视图。
+- 支持视频布局切换、摄像头/麦克风控制、屏幕分享、会中聊天、成员管理、房间邀请、会议预定等完整会中能力。
+- 导出 `atomicx` State 层 `Client`，支持纯 JavaScript / 非 React 环境调用。
