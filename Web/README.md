@@ -6,7 +6,10 @@ English | [简体中文](README.zh.md)
 
 TUIRoomKit(Web) supports audio/video communication, screen sharing, member management, voice and picture banning, chat pop-ups, etc. It is compatible with mainstream PC and mobile browsers, and provides a UI-containing solution that can be quickly deployed for enterprise meetings, online education, Internet healthcare, and web salon scenarios.
 
-The current catalog provides TUIRoomKit(Web) source code and quick run-through demo, if you need to integrate TUIRoomKit into your existing business, please refer to [TUIRoomKIt Integration](https://trtc.io/document/54845?platform=web&product=conference).
+The current catalog provides TUIRoomKit(Web) source code and quick run-through demo for React and Vue. If you need to integrate TUIRoomKit into your existing business, please refer to:
+
+- React: [TUIRoomKit Integration (React)](https://trtc.io/document/80748?product=room&menulabel=uikit&platform=react)
+- Vue: [TUIRoomKit Integration (Vue)](https://trtc.io/document/54845?product=room&menulabel=uikit&platform=vue)
 
 ## Browser Support
 
@@ -23,11 +26,13 @@ TUIRoomKit supports major PC and mobile browsers, please refer to [Browser Suppo
 ├── README.md
 ├── README.zh.md
 ├── example                 -- TUIRoomKit quick run-through demo
+│   ├── vite-react-ts       -- TUIRoomKit quick run-through demo (Vite + react + ts)
 │   ├── vite-vue3-ts        -- TUIRoomKit quick run-through demo (Vite + vue3 + ts)
 │   └── webpack-vue2.7-ts   -- TUIRoomKit quick run-through demo (Webpack + vue2.7 + ts)
 └── roomkit                 -- TUIRoomKit Source Code
-    ├── vue2                -- TUIRoomKit Source Code (support vue2.7)
-    └── vue3                -- TUIRoomKit Source Code (support vue3)
+    ├── react               -- TUIRoomKit Source Code (support react)
+    ├── vue3                -- TUIRoomKit Source Code (support vue3)
+    └── vue2                -- TUIRoomKit Source Code (support vue2.7)
 ```
 
 ## Contact Us
