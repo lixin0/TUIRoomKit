@@ -4,6 +4,10 @@
 
 ---
 
+## [6.1.3] - 2026-07-20
+
+- Added data reporting for start-recording API calls.
+
 ## [6.1.2] - 2026-07-17
 
 ### Fixed
