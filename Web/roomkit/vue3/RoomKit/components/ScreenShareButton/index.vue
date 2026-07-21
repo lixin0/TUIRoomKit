@@ -28,7 +28,7 @@
         @click.stop
       >
         <div class="dropdown-item" @click="handleSelectScreenShare">
-          <IconScreenShare size="20" />
+          <IconScreenShare size="16" />
           <span class="dropdown-item-text">{{ t('ScreenShare.StartSharing') }}</span>
         </div>
         <div
@@ -36,7 +36,7 @@
           class="dropdown-item"
           @click="handleSelectWhiteboard"
         >
-          <component :is="IconWhiteboard" :size="20" />
+          <component :is="IconWhiteboard" :size="16" />
           <span class="dropdown-item-text">{{ t('Whiteboard.Open') }}</span>
         </div>
       </div>
@@ -317,9 +317,9 @@ function handleScreenShare() {
   .dropdown-item {
     display: flex;
     flex-direction: row;
-    gap: 8px;
+    gap: 6px;
     align-items: center;
-    padding: 8px 12px;
+    padding: 6px 8px;
     color: var(--text-color-primary);
     cursor: pointer;
     border-radius: 6px;
@@ -329,8 +329,8 @@ function handleScreenShare() {
     }
 
     .dropdown-item-text {
-      font-size: 14px;
-      line-height: 22px;
+      font-size: 13px;
+      line-height: 20px;
     }
   }
 }
